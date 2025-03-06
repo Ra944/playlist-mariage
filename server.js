@@ -40,7 +40,7 @@ async function getAccessToken() {
 }
 
 /**
- * Route pour rechercher une chanson sur Spotify
+ * Route pour rechercher une chanson sur Spotify avec 20 résultats
  */
 app.get('/search', async (req, res) => {
     const { query } = req.query;
@@ -48,7 +48,7 @@ app.get('/search', async (req, res) => {
 
     try {
         const response = await axios.get(
-            `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=5`,
+            `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=20`, // 🔥 On force la récupération de 20 résultats ici
             { headers: { Authorization: `Bearer ${accessToken}` } }
         );
 

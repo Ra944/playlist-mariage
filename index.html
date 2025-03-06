@@ -1,33 +1,111 @@
-<h1>Ajoute une chanson à la playlist !</h1>
-<input type="text" id="searchQuery" placeholder="Rechercher une chanson">
-<button onclick="searchSong()">Rechercher</button>
-<ul id="results"></ul>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playlist Collaborative - Mariage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        input {
+            padding: 10px;
+            width: 300px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+        li {
+            padding: 10px;
+            background: #f4f4f4;
+            margin: 10px auto;
+            width: 60%;
+            border-radius: 5px;
+        }
+        .add-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .add-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
 
-<script>
-    async function searchSong() {
-        const query = document.getElementById('searchQuery').value;
-        const response = await fetch(`https://playlist-mariage.up.railway.app/search?query=${query}`);
-        const songs = await response.json();
+    <h1>Ajoute une chanson à la playlist !</h1>
+    <input type="text" id="searchQuery" placeholder="Rechercher une chanson">
+    <button onclick="searchSong()">Rechercher</button>
+    <ul id="results"></ul>
 
-        const resultsList = document.getElementById('results');
-        resultsList.innerHTML = '';
+    <script>
+        const API_URL = "https://playlist-mariage-production.up.railway.app"; // URL mise à jour
 
-        songs.forEach(song => {
-            const listItem = document.createElement('li');
-            listItem.innerHTML = `${song.name} - ${song.artists[0].name} 
-                <button onclick="addToPlaylist('${song.uri}')">Ajouter</button>`;
-            resultsList.appendChild(listItem);
-        });
-    }
+        async function searchSong() {
+            const query = document.getElementById('searchQuery').value.trim();
+            if (!query) {
+                alert("Merci de saisir un titre de chanson.");
+                return;
+            }
 
-    async function addToPlaylist(trackUri) {
-        const response = await fetch('https://playlist-mariage.up.railway.app/add', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ trackUri })
-        });
+            try {
+                const response = await fetch(`${API_URL}/search?query=${encodeURIComponent(query)}`);
+                if (!response.ok) throw new Error(`Erreur API: ${response.statusText}`);
 
-        const result = await response.json();
-        alert(result.message || "Erreur lors de l'ajout !");
-    }
-</script>
+                const songs = await response.json();
+                const resultsList = document.getElementById('results');
+                resultsList.innerHTML = '';
+
+                if (songs.length === 0) {
+                    resultsList.innerHTML = "<li>Aucune chanson trouvée.</li>";
+                    return;
+                }
+
+                songs.forEach(song => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `${song.name} - ${song.artists[0].name} 
+                        <button class="add-button" onclick="addToPlaylist('${song.uri}')">Ajouter</button>`;
+                    resultsList.appendChild(listItem);
+                });
+            } catch (error) {
+                console.error("Erreur lors de la recherche :", error);
+                alert("Une erreur s'est produite lors de la recherche. Vérifie la connexion au serveur.");
+            }
+        }
+
+        async function addToPlaylist(trackUri) {
+            try {
+                const response = await fetch(`${API_URL}/add`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ trackUri })
+                });
+
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || "Erreur lors de l'ajout.");
+
+                alert(result.message || "Chanson ajoutée avec succès !");
+            } catch (error) {
+                console.error("Erreur lors de l'ajout :", error);
+                alert("Impossible d'ajouter la chanson. Vérifie la connexion au serveur.");
+            }
+        }
+    </script>
+
+</body>
+</html>
