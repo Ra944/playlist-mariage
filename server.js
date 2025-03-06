@@ -1,6 +1,7 @@
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
+app.use(cors()); // Autoriser toutes les requêtes
 require('dotenv').config();
 
 const app = express();
