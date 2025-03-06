@@ -5,7 +5,13 @@ require('dotenv').config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+
+// 🔥 Correction CORS : Permettre l'accès depuis n'importe quel site (ex : WordPress)
+app.use(cors({
+    origin: '*', // Autorise toutes les origines
+    methods: ['GET', 'POST'], // Autorise GET et POST
+    allowedHeaders: ['Content-Type', 'Authorization'] // Autorise ces headers
+}));
 
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
@@ -15,7 +21,7 @@ const REFRESH_TOKEN = process.env.SPOTIFY_REFRESH_TOKEN;
 let accessToken = '';
 
 /**
- * Récupérer un nouveau token d'accès à partir du Refresh Token
+ * 🎵 Récupérer un nouveau token d'accès à partir du Refresh Token
  */
 async function getAccessToken() {
     console.log("🔄 Récupération du token utilisateur...");
@@ -40,7 +46,7 @@ async function getAccessToken() {
 }
 
 /**
- * Requête pour rechercher une chanson sur Spotify
+ * 🎶 Recherche une chanson sur Spotify
  */
 app.get('/search', async (req, res) => {
     const { query } = req.query;
@@ -61,7 +67,7 @@ app.get('/search', async (req, res) => {
 });
 
 /**
- * Requête pour ajouter une chanson à la playlist
+ * 🎵 Ajoute une chanson à la playlist
  */
 app.post('/add', async (req, res) => {
     console.log("📩 Requête reçue :", req.body);
