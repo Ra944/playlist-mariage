@@ -6,7 +6,7 @@
 <script>
     async function searchSong() {
         const query = document.getElementById('searchQuery').value;
-        const response = await fetch(`http://localhost:3000/search?query=${query}`);
+        const response = await fetch(`https://playlist-mariage.up.railway.app/search?query=${query}`);
         const songs = await response.json();
 
         const resultsList = document.getElementById('results');
@@ -21,27 +21,13 @@
     }
 
     async function addToPlaylist(trackUri) {
-	async function addToPlaylist(trackUri) {
-    console.log("Ajout de la chanson :", trackUri); // 🔍 Vérifie que trackUri est bien récupéré
-
-    const response = await fetch('http://localhost:3000/add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ trackUri })
-    });
-
-    const result = await response.json();
-    console.log("Réponse du serveur :", result); // 🔍 Vérifie la réponse du serveur
-
-    alert(result.message || "Erreur lors de l'ajout !");
-}
-
-        await fetch('http://localhost:3000/add', {
+        const response = await fetch('https://playlist-mariage.up.railway.app/add', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ trackUri })
         });
 
-        alert('Ajouté à la playlist !');
+        const result = await response.json();
+        alert(result.message || "Erreur lors de l'ajout !");
     }
 </script>
